@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a32542">
+  <meta name="description" content="写给吴桦凤的生日礼物：我们的回忆、藏在信里的话，还有所有不曾迟到的祝福。9月19日，生日快乐。">
+  <meta name="robots" content="noindex, nofollow">
+  <title>吴桦凤，生日快乐！｜一份属于你的生日礼物</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23a32542'/%3E%3Ctext x='32' y='44' font-size='41' text-anchor='middle' fill='%23fff6e6'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="content.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <canvas id="celebration" aria-hidden="true"></canvas>
+  <header class="site-header">
+    <a class="wordmark" href="#home" aria-label="回到生日礼物首页"><span class="logo-star">✳</span> 写给桦凤<span class="wordmark-date"> / 09.19</span></a>
+    <nav aria-label="生日礼物导航">
+      <a href="#memories">回忆走廊</a><a href="#letters">给你的信</a><a href="#wish">许个愿吧</a>
+    </nav>
+    <button class="sound-button" id="sound-toggle" type="button" aria-pressed="false"><span aria-hidden="true">♫</span><span id="sound-label">播放生日旋律</span></button>
+  </header>
+  <main id="main">
+    <section class="hero page-width" id="home" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="tiny-star">✦</span> FOR OUR ONE & ONLY HUAFENG</div>
+        <p class="date-script">September <span>19</span><sup>th</sup></p>
+        <h1 id="hero-title">吴桦凤，<br>生日<span class="outlined-word">快乐</span><span class="title-spark">✧</span></h1>
+        <p class="hero-message">迟到的聚会，不迟到的爱。<br>把一起走过的日子，和没说完的祝福，<br>装进这份只属于你的生日礼物。</p>
+        <div class="hero-actions"><a class="button primary" href="#letters">拆开你的生日礼物 <span aria-hidden="true">♡</span></a><a class="quiet-link" href="#memories">先去看看我们的回忆</a></div>
+        <p class="hero-footnote">FROM YOUR FRIENDS, WITH ALL OUR LOVE.</p>
+      </div>
+      <div class="hero-collage" aria-label="我们的回忆照片">
+        <div class="orbit-label">好朋友，永远有下一次见面。</div>
+        <button class="polaroid hero-photo photo-back" id="hero-photo-back" type="button" aria-label="查看回忆照片"><img id="hero-image-back" alt="" fetchpriority="high"><span id="hero-caption-back"></span></button>
+        <button class="polaroid hero-photo photo-front" id="hero-photo-front" type="button" aria-label="查看回忆照片"><span class="tape" aria-hidden="true"></span><img id="hero-image-front" alt="" fetchpriority="high"><span id="hero-caption-front"></span></button>
+        <div class="birthday-stamp"><span>IT'S YOUR DAY</span><strong>HAPPY<br>BIRTHDAY</strong><span>✦ 09 · 19 ✦</span></div>
+        <span class="collage-spark spark-one" aria-hidden="true">✧</span><span class="collage-spark spark-two" aria-hidden="true">✳</span>
+        <p class="collage-note">这些瞬间，幸好有你。<span aria-hidden="true">♡</span></p>
+      </div>
+    </section>
+
+    <section class="blessings-section" aria-labelledby="blessings-title">
+      <div class="page-width blessings-header"><h2 id="blessings-title"><span aria-hidden="true">✦</span> 此刻，祝福都向你飞来</h2><button id="danmu-toggle" class="text-button light" type="button" aria-pressed="false">暂停弹幕</button></div>
+      <div class="danmu-stage" id="danmu-stage" aria-hidden="true"></div>
+      <div class="page-width blessings-bottom"><p>每一句，都是真心的。</p><form id="blessing-form"><label class="sr-only" for="blessing-input">写一句生日祝福</label><input id="blessing-input" maxlength="42" placeholder="也让你的一句祝福飞过去…" required autocomplete="off"><button type="submit">放飞祝福 <span aria-hidden="true">✧</span></button></form><span class="local-note">新祝福仅在本次打开的页面播放</span></div>
+      <details class="blessings-transcript page-width"><summary>静静读一读这些祝福</summary><ul id="blessings-list"></ul></details>
+    </section>
+
+    <section class="memories-section page-width section-space" id="memories" aria-labelledby="memories-title">
+      <div class="section-heading"><div><p class="eyebrow">01 / THE GOOD OLD DAYS</p><h2 id="memories-title">回忆有迹，<em>快乐有你。</em></h2></div><p>一些普通日子，<br>因为我们在一起，变成了舍不得删掉的瞬间。</p></div>
+      <div class="gallery-toolbar"><div class="filter-group" role="group" aria-label="筛选回忆"><button class="filter active" data-filter="all" aria-pressed="true">全部回忆 <span id="all-count"></span></button><button class="filter" data-filter="image" aria-pressed="false">照片 <span id="image-count"></span></button><button class="filter" data-filter="video" aria-pressed="false">视频 <span id="video-count"></span></button></div><span class="gallery-hint">点开一张，把那天再过一遍 <span aria-hidden="true">✧</span></span></div>
+      <div class="memory-grid" id="memory-grid"></div>
+      <p class="gallery-ending"><span></span>故事还长，下次见面继续拍。<span></span></p>
+    </section>
+
+    <section class="letters-section section-space" id="letters" aria-labelledby="letters-title">
+      <div class="page-width"><div class="section-heading"><div><p class="eyebrow">02 / WORDS FROM THE HEART</p><h2 id="letters-title">有些话，<em>想认真写给你。</em></h2></div><p>平时说不出口的，<br>今天都藏在信里。请亲手拆开。</p></div><div id="letter-envelopes" class="letter-envelopes"></div><p class="letters-footnote">一封信很轻，一份惦念很重。</p></div>
+    </section>
+
+    <section class="wish-section page-width section-space" id="wish" aria-labelledby="wish-title">
+      <div class="cake-scene"><div class="cake-halo" aria-hidden="true"></div><span class="cake-star cake-star-a" aria-hidden="true">✧</span><span class="cake-star cake-star-b" aria-hidden="true">✧</span><span class="cake-star cake-star-c" aria-hidden="true">✦</span><div class="cake-visual"><img src="assets/cake.png" id="cake-image" width="1024" height="1024" alt="为桦凤准备的樱桃奶油生日蛋糕，上面有一根生日蜡烛" loading="lazy"><span class="candle-flame" id="candle-flame" aria-hidden="true"></span></div><p class="cake-caption">A LITTLE WISH, A LITTLE MAGIC.</p></div>
+      <div class="wish-copy"><p class="eyebrow">03 / MAKE A WISH</p><h2 id="wish-title">现在，<br>世界为你<em>安静三秒。</em></h2><p id="wish-message">闭上眼睛，许一个只属于你的愿望。<br>不用说出来，我们陪你等它实现。</p><button class="button primary" id="wish-button" type="button"><span aria-hidden="true">✧</span> 许好愿了，吹灭蜡烛</button><p class="wish-note" id="wish-note" role="status">点击按钮，就能吹灭蜡烛。</p><button class="text-button relight" id="relight-button" type="button" hidden>再点亮一次</button></div>
+    </section>
+
+    <section class="card-section section-space" id="card" aria-labelledby="card-title"><div class="page-width card-layout"><div class="card-copy"><p class="eyebrow">04 / A KEEPSAKE FOR YOU</p><h2 id="card-title">把今天的快乐，<br><em>好好收藏。</em></h2><p>一张可以带走的电子贺卡。<br>愿你每次打开，都记得：<br>你一直被我们认真地喜欢着。</p><button class="button outline" id="download-card" type="button">收藏生日贺卡 <span aria-hidden="true">↓</span></button><p class="download-note" id="download-note" role="status">保存为图片，留住这一份心意。</p></div><div class="keepsake" id="keepsake"><div class="keepsake-top"><span>TO: 吴桦凤</span><span>09 / 19</span></div><span class="keepsake-star" aria-hidden="true">✳</span><p class="keepsake-script">Happy Birthday</p><h3>愿你永远自由，<br>永远热烈，<br>永远是你。</h3><div class="keepsake-bottom"><p>生日快乐，吴桦凤。<br>我们都在，来日方长。</p><span>你的好朋友们<br>WITH LOVE ♡</span></div></div></div></section>
+  </main>
+  <footer class="page-width"><a class="wordmark" href="#home"><span class="logo-star">✳</span> 写给桦凤</a><p>我们会有很多很多个，一起庆祝的生日。</p><span>09.19 · 未完待续 ♡</span></footer>
+  <dialog id="media-dialog" class="media-dialog" aria-labelledby="media-title"><div class="dialog-top"><span id="media-counter"></span><button class="icon-button close-dialog" type="button" aria-label="关闭回忆">×</button></div><div id="media-viewer" class="media-viewer"></div><div class="media-bottom"><button id="media-prev" class="icon-button" type="button" aria-label="上一段回忆">‹</button><div><h2 id="media-title"></h2><p id="media-type"></p></div><button id="media-next" class="icon-button" type="button" aria-label="下一段回忆">›</button></div></dialog>
+  <dialog id="letter-dialog" class="letter-dialog" aria-labelledby="letter-title"><button class="icon-button close-dialog" type="button" aria-label="收起信件">×</button><div class="letter-paper"><p class="eyebrow" id="letter-eyebrow"></p><h2 id="letter-title"></h2><div id="letter-content"></div><div class="letter-seal" aria-hidden="true">WITH LOVE ♡</div></div></dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <noscript><p class="noscript">请开启浏览器的 JavaScript，以拆开信件、查看回忆并点亮生日惊喜。</p></noscript>
+</body>
+</html>
