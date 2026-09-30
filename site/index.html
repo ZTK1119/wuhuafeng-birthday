@@ -8,9 +8,9 @@
   <meta name="robots" content="noindex, nofollow">
   <title>吴桦凤，生日快乐！｜一份属于你的生日礼物</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23a32542'/%3E%3Ctext x='32' y='44' font-size='41' text-anchor='middle' fill='%23fff6e6'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2">
   <script src="content.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=2" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -51,8 +51,10 @@
 
     <section class="memories-section page-width section-space" id="memories" aria-labelledby="memories-title">
       <div class="section-heading"><div><p class="eyebrow">01 / THE GOOD OLD DAYS</p><h2 id="memories-title">回忆有迹，<em>快乐有你。</em></h2></div><p>一些普通日子，<br>因为我们在一起，变成了舍不得删掉的瞬间。</p></div>
-      <div class="gallery-toolbar"><div class="filter-group" role="group" aria-label="筛选回忆"><button class="filter active" data-filter="all" aria-pressed="true">全部回忆 <span id="all-count"></span></button><button class="filter" data-filter="image" aria-pressed="false">照片 <span id="image-count"></span></button><button class="filter" data-filter="video" aria-pressed="false">视频 <span id="video-count"></span></button></div><span class="gallery-hint">点开一张，把那天再过一遍 <span aria-hidden="true">✧</span></span></div>
-      <div class="memory-grid" id="memory-grid"></div>
+      <div class="gallery-toolbar"><div class="filter-group" role="group" aria-label="筛选回忆"><button class="filter active" data-filter="all" aria-pressed="true">全部回忆 <span id="all-count"></span></button><button class="filter" data-filter="image" aria-pressed="false">照片 <span id="image-count"></span></button><button class="filter" data-filter="video" aria-pressed="false">视频 <span id="video-count"></span></button></div><div class="flow-controls" role="group" aria-label="回忆照片带控制"><button id="flow-prev" type="button" aria-label="向前翻动回忆照片带">往前翻</button><button id="flow-toggle" type="button" aria-pressed="false">暂停流动</button><button id="flow-next" type="button" aria-label="向后翻动回忆照片带">往后翻</button></div></div>
+      <p class="flow-intro"><span>THE MOMENTS WE KEEP</span><span>左右滑动，翻翻我们的旧时光。</span></p>
+      <div class="memory-flow" id="memory-grid"></div>
+      <p class="flow-hint">按住拖动，或左右滑动 · 点开照片与视频，把那天再过一遍</p>
       <p class="gallery-ending"><span></span>故事还长，下次见面继续拍。<span></span></p>
     </section>
 

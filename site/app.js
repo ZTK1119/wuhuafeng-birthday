@@ -31,6 +31,7 @@
   const letterDialog = $('#letter-dialog');
   function updateScrollLock() {
     document.body.style.overflow = $$('dialog[open]').length ? 'hidden' : '';
+    syncFlowAnimation();
   }
   function stopVideo() {
     const video = $('#media-viewer video');
@@ -81,14 +82,126 @@
     mediaIndex = (mediaIndex + delta + viewerMedia.length) % viewerMedia.length;
     displayMedia();
   }
+  // Native scroll surfaces keep every memory reachable by touch and keyboard.
+  // The two lanes reverse gently at their ends; there are no duplicated cards.
+  const flow = $('#memory-grid');
+  let flowStates = [];
+  let flowFrame = 0;
+  let flowLastTime = 0;
+  let flowVisible = false;
+  let flowPaused = false;
+  const flowResize = new ResizeObserver(() => updateFlowControls());
+  function flowCanRun() {
+    return flowVisible && !flowPaused && !reduced.matches && !document.hidden && !$$('dialog[open]').length;
+  }
+  function syncFlowAnimation() {
+    if (flowCanRun() && !flowFrame) {
+      flowLastTime = performance.now();
+      flowFrame = requestAnimationFrame(animateFlow);
+    } else if (!flowCanRun() && flowFrame) {
+      cancelAnimationFrame(flowFrame);
+      flowFrame = 0;
+    }
+  }
+  function animateFlow(now) {
+    flowFrame = 0;
+    if (!flowCanRun()) return;
+    const delta = Math.min(now - flowLastTime, 50) / 1000;
+    flowLastTime = now;
+    flowStates.forEach(state => {
+      const lane = state.lane;
+      const max = lane.scrollWidth - lane.clientWidth;
+      if (max < 2 || state.hovered || state.focused || state.drag || now < state.holdUntil) return;
+      if (lane.scrollLeft >= max - 1) state.direction = -1;
+      else if (lane.scrollLeft <= 1) state.direction = 1;
+      state.velocity += (state.direction * 27 - state.velocity) * Math.min(delta * 3, 1);
+      state.remainder += state.velocity * delta;
+      const move = Math.trunc(state.remainder);
+      if (move) { lane.scrollLeft += move; state.remainder -= move; }
+    });
+    flowFrame = requestAnimationFrame(animateFlow);
+  }
+  function updateFlowControls() {
+    $('#flow-prev').disabled = flowStates.every(s => s.lane.scrollLeft <= 1);
+    $('#flow-next').disabled = flowStates.every(s => s.lane.scrollLeft >= s.lane.scrollWidth - s.lane.clientWidth - 1);
+    $('#flow-toggle').textContent = reduced.matches ? '手动浏览' : flowPaused ? '继续流动' : '暂停流动';
+    $('#flow-toggle').setAttribute('aria-pressed', String(flowPaused || reduced.matches));
+    $('#flow-toggle').disabled = reduced.matches;
+  }
+  function connectLane(lane, index) {
+    const state = {lane, direction:index % 2 ? -1 : 1, velocity:index % 2 ? -27 : 27, remainder:0, hovered:false, focused:false, drag:null, holdUntil:0, blockClickUntil:0};
+    flowStates.push(state);
+    lane.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') state.hovered = true; });
+    lane.addEventListener('pointerleave', () => { state.hovered = false; });
+    lane.addEventListener('focusin', e => { state.focused = e.target.matches(':focus-visible'); });
+    lane.addEventListener('focusout', e => { state.focused = lane.contains(e.relatedTarget); });
+    lane.addEventListener('wheel', () => { state.holdUntil = performance.now() + 3500; }, {passive:true});
+    lane.addEventListener('touchstart', () => { state.holdUntil = Infinity; }, {passive:true});
+    ['touchend','touchcancel'].forEach(name => lane.addEventListener(name, () => { state.holdUntil = performance.now() + 3500; }, {passive:true}));
+    lane.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      state.drag = {x:e.clientX, start:lane.scrollLeft, moved:false, pointerId:e.pointerId};
+    });
+    lane.addEventListener('pointermove', e => {
+      if (!state.drag) return;
+      if (!(e.buttons & 1)) { endDrag(e); return; }
+      const distance = e.clientX - state.drag.x;
+      if (!state.drag.moved && Math.abs(distance) > 6) {
+        state.drag.moved = true;
+        lane.setPointerCapture(e.pointerId);
+        lane.classList.add('dragging');
+      }
+      if (state.drag.moved) {
+        e.preventDefault();
+        lane.scrollLeft = state.drag.start - distance;
+      }
+    });
+    function endDrag(e) {
+      if (!state.drag) return;
+      if (state.drag.moved) state.blockClickUntil = performance.now() + 250;
+      if (lane.hasPointerCapture(e.pointerId)) lane.releasePointerCapture(e.pointerId);
+      state.drag = null;
+      state.holdUntil = performance.now() + 3500;
+      lane.classList.remove('dragging');
+    }
+    state.endDrag = endDrag;
+    ['pointerup','pointercancel','lostpointercapture'].forEach(name => lane.addEventListener(name,endDrag));
+    lane.addEventListener('click', e => {
+      if (performance.now() < state.blockClickUntil) { e.preventDefault(); e.stopImmediatePropagation(); }
+    }, true);
+    lane.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      state.focused = true;
+      e.preventDefault();
+      state.holdUntil = performance.now() + 3500;
+      lane.scrollBy({left:lane.clientWidth * .65 * (e.key === 'ArrowRight' ? 1 : -1),behavior:reduced.matches?'instant':'smooth'});
+    });
+    lane.addEventListener('scroll', updateFlowControls, {passive:true});
+    flowResize.observe(lane);
+    return state;
+  }
   function renderGallery(filter = 'all') {
     filteredMedia = data.media.filter(x => filter === 'all' || x.type === filter);
-    const grid = $('#memory-grid');
-    grid.replaceChildren();
-    filteredMedia.forEach(item => {
+    flowResize.disconnect();
+    flowStates = [];
+    flow.replaceChildren();
+    const rowCount = filteredMedia.length > 6 ? 2 : 1;
+    const lanes = Array.from({length:rowCount}, (_, index) => {
+      const lane = element('div', 'memory-lane');
+      lane.tabIndex = 0;
+      lane.setAttribute('role','region');
+      lane.setAttribute('aria-label', '第' + (index + 1) + '条回忆照片带，可左右滑动');
+      flow.append(lane);
+      connectLane(lane,index);
+      return lane;
+    });
+    filteredMedia.forEach((item,index) => {
       const button = element('button', 'memory-card');
       button.type = 'button';
       button.dataset.id = item.id;
+      const ratio = item.width / item.height;
+      button.style.setProperty('--card-width', (Math.round(230 * Math.min(2.05, Math.max(.75, ratio))) + 22) + 'px');
+      if (ratio > 2) button.classList.add('panoramic');
       button.setAttribute('aria-label', (item.type === 'video' ? '播放视频：' : '查看照片：') + item.title);
       const thumb = element('div', 'memory-thumb');
       const img = document.createElement('img');
@@ -98,6 +211,7 @@
       img.decoding = 'async';
       img.width = item.width;
       img.height = item.height;
+      img.draggable = false;
       thumb.append(img);
       if (item.type === 'video') {
         const play = element('span', 'play-badge', '▶');
@@ -108,10 +222,30 @@
       caption.append(element('strong', '', item.title), element('span', '', String(data.media.indexOf(item) + 1).padStart(2,'0')));
       button.append(thumb, caption);
       button.addEventListener('click', () => openMedia(item.id));
-      grid.append(button);
+      lanes[index % rowCount].append(button);
     });
+    if (lanes.length > 1) lanes[1].scrollLeft = Math.min(220, lanes[1].scrollWidth - lanes[1].clientWidth);
+    updateFlowControls();
+    syncFlowAnimation();
   }
   renderGallery();
+  ['pointerup','pointercancel'].forEach(name => window.addEventListener(name, e => {
+    flowStates.forEach(state => state.endDrag(e));
+  }));
+  const flowObserver = new IntersectionObserver(entries => {
+    flowVisible = entries[0].isIntersecting;
+    syncFlowAnimation();
+  }, {threshold:.05});
+  flowObserver.observe(flow);
+  $('#flow-toggle').addEventListener('click', () => { flowPaused = !flowPaused; updateFlowControls(); syncFlowAnimation(); });
+  [['#flow-prev',-1],['#flow-next',1]].forEach(([selector,direction]) => $(selector).addEventListener('click', () => {
+    flowStates.forEach(state => {
+      state.holdUntil = performance.now() + 4500;
+      state.lane.scrollBy({left:state.lane.clientWidth * .65 * direction,behavior:reduced.matches?'instant':'smooth'});
+    });
+  }));
+  reduced.addEventListener('change', () => { updateFlowControls(); syncFlowAnimation(); });
+  document.addEventListener('visibilitychange', syncFlowAnimation);
   $('#all-count').textContent = data.media.length;
   $('#image-count').textContent = data.media.filter(x => x.type === 'image').length;
   $('#video-count').textContent = data.media.filter(x => x.type === 'video').length;
@@ -119,7 +253,7 @@
     $$('.filter').forEach(b => { b.classList.toggle('active', b === button); b.setAttribute('aria-pressed', String(b === button)); });
     renderGallery(button.dataset.filter);
   }));
-  [['back','memory-07'],['front','memory-09']].forEach(([placement,id]) => {
+  [['back','memory-10'],['front','memory-09']].forEach(([placement,id]) => {
     const item = data.media.find(x => x.id === id);
     const img = $('#hero-image-' + placement);
     img.src = item.src;
